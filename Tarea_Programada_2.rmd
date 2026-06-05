@@ -4,7 +4,8 @@ author: "Jorge Liang"
 date: "2026-06-04"
 output: html_document
 ---
-# Cargar bibliotecas
+
+Cargar bibliotecas
 ```{r}
 library(nycflights13)
 library(dplyr)
@@ -13,11 +14,16 @@ library(tidyr)
 library(lubridate)
 library(DT)
 ```
+
 ```{r}
 data("flights")
 data("airlines")
 data("airports")
 data("planes")
 data("weather")
+```
+
+```{r}
+print('hello')
 ```
 
