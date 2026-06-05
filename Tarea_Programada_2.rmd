@@ -24,6 +24,6 @@ data("weather")
 ```
 
 ```{r}
-print('hello')
+print('hello word')
 ```
 
