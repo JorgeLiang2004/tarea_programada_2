@@ -24,6 +24,44 @@ data("weather")
 ```
 
 ```{r}
-print('hello word')
+flights %>% 
+  slice_head(n = 100) %>% 
+  datatable(options = list(pageLength = 10))
+```
+
+```{r}
+data.frame(
+  datos = c("flights", "airlines", "airports", "planes", "weather"),
+  filas = c(nrow(flights), nrow(airlines), nrow(airports), nrow(planes), nrow(weather)),
+  columnas = c(ncol(flights), ncol(airlines), ncol(airports), ncol(planes), ncol(weather)),
+  tipo_general = c(class(flights), class(airlines), class(airports), class(planes), class(weather))
+)
+
+```
+
+
+```{r}
+sum(is.na(flights$dep_time))
+mean(is.na(flights$dep_time)) * 100
+
+sum(is.na(flights$dep_delay))
+mean(is.na(flights$dep_delay)) * 100
+
+sum(is.na(flights$arr_time))
+mean(is.na(flights$arr_time)) * 100
+
+sum(is.na(flights$arr_delay))
+mean(is.na(flights$arr_delay)) * 100
+
+sum(is.na(flights$tailnum))
+mean(is.na(flights$tailnum)) * 100
+```
+```{r}
+flights_sin_na <- na.omit(flights)
+
+```
+
+```{r}
+
 ```
 
