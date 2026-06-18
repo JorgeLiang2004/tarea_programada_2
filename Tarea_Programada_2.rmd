@@ -5,7 +5,8 @@ date: "2026-06-04"
 output: html_document
 ---
 
-Cargar bibliotecas
+Carga, exploración y calidad de datos
+1
 ```{r}
 library(nycflights13)
 library(dplyr)
@@ -22,13 +23,13 @@ data("airports")
 data("planes")
 data("weather")
 ```
-
+2
 ```{r}
 flights %>% 
   slice_head(n = 100) %>% 
   datatable(options = list(pageLength = 10))
 ```
-
+3
 ```{r}
 data.frame(
   datos = c("flights", "airlines", "airports", "planes", "weather"),
@@ -39,7 +40,7 @@ data.frame(
 
 ```
 
-
+4
 ```{r}
 sum(is.na(flights$dep_time))
 mean(is.na(flights$dep_time)) * 100
@@ -56,12 +57,79 @@ mean(is.na(flights$arr_delay)) * 100
 sum(is.na(flights$tailnum))
 mean(is.na(flights$tailnum)) * 100
 ```
+Integración y preparación de datos
+1
 ```{r}
-flights_sin_na <- na.omit(flights)
+vuelos_analisis <- left_join(flights, airlines, by = "carrier")
+vuelos_analisis <- left_join(vuelos_analisis, airports, by = c("dest" = "faa"))
+vuelos_analisis <- left_join(vuelos_analisis, planes, by = "tailnum")
+vuelos_analisis <- left_join(vuelos_analisis, weather, by = c("origin" = "origin", "time_hour" = "time_hour"))
+```
+2
+```{r}
+nrow(vuelos_analisis) == nrow(flights) 
+```
+3
+```{r}
+vuelos_analisis <- left_join(flights, airlines, by = "carrier")
+nrow(vuelos_analisis) == nrow(flights) 
+
+vuelos_analisis <- left_join(vuelos_analisis, airports, by = c("dest" = "faa"))
+nrow(vuelos_analisis) == nrow(flights)
+
+vuelos_analisis <- left_join(vuelos_analisis, planes, by = "tailnum")
+nrow(vuelos_analisis) == nrow(flights)
+
+vuelos_analisis <- left_join(vuelos_analisis, weather, by = c("origin" = "origin", "time_hour" = "time_hour"))
+nrow(vuelos_analisis) == nrow(flights)
+```
+5
+```{r}
+datos_analisis <- vuelos_analisis %>%
+  # Si existe cancelado, filtrar; si no, usar todos
+  { if ("cancelado" %in% names(.)) filter(., cancelado == 0) else . } %>%
+  # Seleccionar solo columnas existentes
+  select(any_of(c("fecha", "origin", "dest", "carrier", "name", "tailnum", 
+                  "dep_delay", "arr_delay", "retraso_llegada",
+                  "temp", "humid", "wind_speed", "precip")))
+```
+
+Visualización de datos
+1
+```{r}
+vuelos_mensuales <- flights %>%
+  group_by(origin, month) %>%
+  summarise(n = n())
+
+ggplot(vuelos_mensuales, aes(x = month, y = n, color = origin)) +
+  geom_line(size = 1) +
+  geom_point(size = 1) +
+  labs(
+    title = "numero mensual de vuelos por aeropuerto de origen",
+    x = "mes",
+    y = "numero de vuelos",
+    color = "aeropuerto")
+```
+2
+```{r}
+vuelos_destino <- vuelos_analisis %>%
+  group_by(name.y) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n)) %>%
+  slice_head(n = 10)
+
+ggplot(vuelos_destino, aes(x = reorder(name.y, n), y = n)) +
+  geom_col() +
+  coord_flip() +
+  labs(
+    title = "los 10 destinos con mas vuelos",
+    x = "aeropurto",
+    y = "vuelos"
+  )
+```
+3
+```{r}
 
 ```
 
-```{r}
-
-```
 
